@@ -22,6 +22,7 @@ public class ProductServiceImpl implements ProductService {
         this.productRepository = productRepository;
     }
 
+    //MultipartFile represents the uploaded file
     public Product saveAttachment(MultipartFile file) throws IOException, MaxUploadSizeExceededException {
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
         try {
@@ -34,7 +35,7 @@ public class ProductServiceImpl implements ProductService {
 
             Product attachment = new Product(fileName, file.getContentType(), file.getBytes());
             return productRepository.save(attachment);
-        } catch (Exception e) {
+        }  catch (Exception e) {
             throw new RuntimeException("Could not save file: " + fileName, e);
         }
     }

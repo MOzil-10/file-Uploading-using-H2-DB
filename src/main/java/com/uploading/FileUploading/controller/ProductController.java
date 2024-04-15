@@ -27,9 +27,9 @@ public class ProductController {
     }
 
     // for uploading the SINGLE file to the database
+    //MultipartFile represents the uploaded file
     @PostMapping("/single/base")
     public ResponseClass uploadFile(@RequestParam("file") MultipartFile file) throws Exception {
-
         Product attachment = null;
         String downloadURl = "";
         attachment = productService.saveAttachment(file);
@@ -48,6 +48,8 @@ public class ProductController {
     @PostMapping("/multiple/base")
     public List<ResponseClass> uploadMultipleFiles(@RequestParam("files") MultipartFile[] files) throws Exception {
         List<ResponseClass> responseList = new ArrayList<>();
+
+        //For each file, call the saveAttachment method of productService to save the file to the database.
         for (MultipartFile file : files) {
             Product attachment = productService.saveAttachment(file);
             String downloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
@@ -85,7 +87,7 @@ public class ProductController {
     public ResponseEntity<ResponseClass> handleFileUpload(@RequestParam("file") MultipartFile file) {
         String fileName = file.getOriginalFilename();
         try {
-            file.transferTo(new File("D:\\Folder\\" + fileName));
+            file.transferTo(new File( fileName));
             String downloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path("/download/")
                     .path(fileName)
@@ -106,7 +108,7 @@ public class ProductController {
         for (MultipartFile file : files) {
             String fileName = file.getOriginalFilename();
             try {
-                file.transferTo(new File("D:\\Folder\\" + fileName));
+                file.transferTo(new File(fileName));
                 String downloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
                         .path("/download/")
                         .path(fileName)
