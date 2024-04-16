@@ -29,25 +29,15 @@ public class ProductController {
     /*
       This method handles HTTP POST requests to the endpoint /single/base
       Defined attachment variable and initialized it to null value
-      Defined downloadUrl variable and initialized it to an empty string
       Calls the saveAttachment from the service(productService) to save the file
-      downloadUrl creates url to download the file
        */
     @PostMapping("/single/file")
-    public ResponseClass uploadFile(@RequestParam("file") MultipartFile file) throws Exception {
-        Product attachment = null;
-        String downloadURl = "";
-
-        attachment = productService.saveAttachment(file);
-        downloadURl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/download/")
-                .path(attachment.getId())
-                .toUriString();
-
-        return new ResponseClass(attachment.getFileName(),
-                downloadURl,
-                file.getContentType(),
-                file.getSize());
+    public ResponseEntity<ResponseClass> uploadFile(@RequestParam("file") MultipartFile file) throws Exception {
+        Product attachment = productService.saveAttachment(file);
+        ResponseClass response = new ResponseClass(attachment.getFileName(),
+                attachment.getFileType(),
+                attachment.getData().length);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     /*
@@ -55,38 +45,28 @@ public class ProductController {
     For each file, call the saveAttachment method of productService to save the file to the database.
      */
     @PostMapping("/multiple/file")
-    public List<ResponseClass> uploadMultipleFiles(@RequestParam("files") MultipartFile[] files) throws Exception {
+    public ResponseEntity<List<ResponseClass>> uploadMultipleFiles(@RequestParam("files") MultipartFile[] files) throws Exception {
         List<ResponseClass> responseList = new ArrayList<>();
 
         for (MultipartFile file : files) {
             Product attachment = productService.saveAttachment(file);
-            String downloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/download/")
-                    .path(attachment.getId())
-                    .toUriString();
             ResponseClass response = new ResponseClass(attachment.getFileName(),
-                    downloadUrl,
-                    file.getContentType(),
-                    file.getSize());
+                    attachment.getFileType(),
+                    attachment.getData().length);
             responseList.add(response);
         }
-        return responseList;
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseList);
     }
 
     //for retrieving  all the  files uploaded
     @GetMapping("/all")
     public ResponseEntity<List<ResponseClass>> getAllFiles() {
         List<Product> products = productService.getAllFiles();
-        List<ResponseClass> responseClasses = products.stream().map(product -> {
-            String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/download/")
-                    .path(product.getId())
-                    .toUriString();
-            return new ResponseClass(product.getFileName(),
-                    downloadURL,
-                    product.getFileType(),
-                    product.getData().length);
-        }).collect(Collectors.toList());
+        List<ResponseClass> responseClasses = products.stream().map(product -> new ResponseClass(
+                        product.getFileName(),
+                        product.getFileType(),
+                        product.getData().length))
+                .collect(Collectors.toList());
 
         return ResponseEntity.ok().body(responseClasses);
     }

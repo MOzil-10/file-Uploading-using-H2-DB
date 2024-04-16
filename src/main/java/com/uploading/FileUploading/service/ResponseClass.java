@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 public class ResponseClass {
 
     private String fileName;
-    private String downloadUrl;
     private String fileType;
     private long fileSize;
 }

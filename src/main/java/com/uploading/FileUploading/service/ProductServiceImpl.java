@@ -26,7 +26,7 @@ public class ProductServiceImpl implements ProductService {
     MultiPartFile is like a container provided by Java to manage uploaded files.
     Start by sanitizing the file to ensure that it does not bring anything that can be harmful to the app.
     The method throws two exceptions, checks if the file is valid and also checks the size of the file.
-    Created attachment variable of type Product which is the actual file that we are going to save
+    Created attachment variable of type Product which is the actual file that we are going to save.
      */
     public Product saveAttachment(MultipartFile file) throws IOException, MaxUploadSizeExceededException {
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
