@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,11 +24,12 @@ public class ProductController {
         this.productService = productService;
     }
 
-    /*
-      This method handles HTTP POST requests to the endpoint /single/base
-      Defined attachment variable and initialized it to null value
-      Calls the saveAttachment from the service(productService) to save the file
-       */
+    /**
+     * Handles HTTP POST requests to upload a single file.
+     * @param file The file to be uploaded.
+     * @return ResponseEntity with the response for the uploaded file.
+     * @throws Exception If an error occurs during file processing.
+     */
     @PostMapping("/single/file")
     public ResponseEntity<ResponseClass> uploadFile(@RequestParam("file") MultipartFile file) throws Exception {
         Product attachment = productService.saveAttachment(file);
@@ -39,9 +39,11 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    /*
-    This method handles HTTP POST requests to the endpoint /multiple/base
-    For each file, call the saveAttachment method of productService to save the file to the database.
+    /**
+     * Handles HTTP POST requests to upload multiple files.
+     * @param files The array of files to be uploaded.
+     * @return ResponseEntity with the response for the uploaded files.
+     * @throws Exception If an error occurs during file processing.
      */
     @PostMapping("/multiple/file")
     public ResponseEntity<List<ResponseClass>> uploadMultipleFiles(@RequestParam("files") MultipartFile[] files) throws Exception {
@@ -57,7 +59,10 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseList);
     }
 
-    //for retrieving  all the  files uploaded
+    /**
+     * Retrieves all uploaded files.
+     * @return ResponseEntity with the list of uploaded files.
+     */
     @GetMapping("/all")
     public ResponseEntity<List<ResponseClass>> getAllFiles() {
         List<Product> products = productService.getAllFiles();
@@ -69,5 +74,4 @@ public class ProductController {
 
         return ResponseEntity.ok().body(responseClasses);
     }
-
 }

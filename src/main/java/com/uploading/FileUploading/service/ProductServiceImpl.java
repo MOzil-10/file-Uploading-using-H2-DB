@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -22,14 +23,15 @@ public class ProductServiceImpl implements ProductService {
         this.productRepository = productRepository;
     }
 
-    /*
-    MultiPartFile is like a container provided by Java to manage uploaded files.
-    Start by sanitizing the file to ensure that it does not bring anything that can be harmful to the app.
-    The method throws two exceptions, checks if the file is valid and also checks the size of the file.
-    Created attachment variable of type Product which is the actual file that we are going to save.
+    /**
+     * Saves a single file as a Product entity.
+     * @param file The file to be saved.
+     * @return The saved Product entity.
+     * @throws IOException If an I/O error occurs during file processing.
+     * @throws MaxUploadSizeExceededException If the file size exceeds the maximum allowed size.
      */
     public Product saveAttachment(MultipartFile file) throws IOException, MaxUploadSizeExceededException {
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         try {
             if (fileName.contains("...")) {
                 throw new Exception("File contains invalid path sequence: " + fileName);
@@ -45,11 +47,9 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    /*
-    Method to save multiple files.
-    Takes an array of MultipartFile named files.
-    Make use of Arrays.asList to convert the array to a List<MultipartFile>.
-    Calls the saveAttachment method to save the files.
+    /**
+     * Saves multiple files as Product entities.
+     * @param files The array of files to be saved.
      */
     public void saveFiles(MultipartFile[] files) {
 
@@ -62,9 +62,9 @@ public class ProductServiceImpl implements ProductService {
         });
     }
 
-    /*
-    This method retrieves all the Product entities from the database (files)
-    returns a list of Product objects representing all files stored in the database
+    /**
+     * Retrieves all Product entities from the database.
+     * @return A list of Product entities representing all files stored in the database.
      */
     public List<Product> getAllFiles() {
         return  productRepository.findAll();
