@@ -26,12 +26,18 @@ public class ProductController {
         this.productService = productService;
     }
 
-    // for uploading the SINGLE file to the database
-    //MultipartFile represents the uploaded file
-    @PostMapping("/single/base")
+    /*
+      This method handles HTTP POST requests to the endpoint /single/base
+      Defined attachment variable and initialized it to null value
+      Defined downloadUrl variable and initialized it to an empty string
+      Calls the saveAttachment from the service(productService) to save the file
+      downloadUrl creates url to download the file
+       */
+    @PostMapping("/single/file")
     public ResponseClass uploadFile(@RequestParam("file") MultipartFile file) throws Exception {
         Product attachment = null;
         String downloadURl = "";
+
         attachment = productService.saveAttachment(file);
         downloadURl = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/download/")
@@ -44,12 +50,14 @@ public class ProductController {
                 file.getSize());
     }
 
-    //for uploading the MULTIPLE files to the database
-    @PostMapping("/multiple/base")
+    /*
+    This method handles HTTP POST requests to the endpoint /multiple/base
+    For each file, call the saveAttachment method of productService to save the file to the database.
+     */
+    @PostMapping("/multiple/file")
     public List<ResponseClass> uploadMultipleFiles(@RequestParam("files") MultipartFile[] files) throws Exception {
         List<ResponseClass> responseList = new ArrayList<>();
 
-        //For each file, call the saveAttachment method of productService to save the file to the database.
         for (MultipartFile file : files) {
             Product attachment = productService.saveAttachment(file);
             String downloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
@@ -64,6 +72,7 @@ public class ProductController {
         }
         return responseList;
     }
+
     //for retrieving  all the  files uploaded
     @GetMapping("/all")
     public ResponseEntity<List<ResponseClass>> getAllFiles() {
@@ -80,49 +89,6 @@ public class ProductController {
         }).collect(Collectors.toList());
 
         return ResponseEntity.ok().body(responseClasses);
-    }
-
-    //for uploading the SINGLE file to the File System
-    @PostMapping("/single/file")
-    public ResponseEntity<ResponseClass> handleFileUpload(@RequestParam("file") MultipartFile file) {
-        String fileName = file.getOriginalFilename();
-        try {
-            file.transferTo(new File( fileName));
-            String downloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/download/")
-                    .path(fileName)
-                    .toUriString();
-            ResponseClass response = new ResponseClass(fileName,
-                    downloadUrl,
-                    file.getContentType(),
-                    file.getSize());
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-    //for uploading the MULTIPLE file to the File system
-    @PostMapping("/multiple/file")
-    public ResponseEntity<List<ResponseClass>> handleMultipleFilesUpload(@RequestParam("files") MultipartFile[] files) {
-        List<ResponseClass> responseList = new ArrayList<>();
-        for (MultipartFile file : files) {
-            String fileName = file.getOriginalFilename();
-            try {
-                file.transferTo(new File(fileName));
-                String downloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                        .path("/download/")
-                        .path(fileName)
-                        .toUriString();
-                ResponseClass response = new ResponseClass(fileName,
-                        downloadUrl,
-                        file.getContentType(),
-                        file.getSize());
-                responseList.add(response);
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
-        }
-        return ResponseEntity.ok(responseList);
     }
 
 }
